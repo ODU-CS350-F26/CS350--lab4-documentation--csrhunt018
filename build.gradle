@@ -8,7 +8,6 @@ repositories {
     mavenCentral()
 }
 
-
 java {
     sourceCompatibility = JavaVersion.toVersion(11)
     targetCompatibility = JavaVersion.toVersion(11)
@@ -17,6 +16,7 @@ java {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'   // REQUIRED on Gradle 9
 }
 
 tasks.withType(Test) {
@@ -24,10 +24,40 @@ tasks.withType(Test) {
     ignoreFailures = true
     testLogging {
         events "passed", "skipped", "failed"
-        }
+    }
 }
 
-application { //Allows  ./gradlew run --args=path-to-test-data
+application {
     mainClass = 'edu.odu.cs.MostCommonWords'
 }
 
+task copyHtml(type: Copy) {
+    dependsOn javadoc
+    from 'src/main/html'
+    into 'build/reports'
+}
+
+task copyJavadoc(type: Copy) {
+    dependsOn javadoc
+    from 'build/docs/javadoc'
+    into 'build/reports/javadoc'
+}
+
+task reports {
+    dependsOn build, copyHtml, copyJavadoc
+}
+
+gitPublish {
+    repoUri = 'git@github.com:ODU-CS350-F26/CS350--lab4-documentation--csrhunt018.git'
+    branch = 'gh-pages'
+    contents {
+        from 'build/reports'
+    }
+    commitMessage = 'Update reports'
+}
+
+gitPublishCopy.dependsOn reports
+
+task deployReports {
+    dependsOn gitPublishPush
+}
