@@ -1,6 +1,6 @@
 # Project Reports
 
-Your Name
+Richard Hunt
 
 * [Tests](./reports/tests/test/)
 * [JavaDoc](./reports/javadoc/)
